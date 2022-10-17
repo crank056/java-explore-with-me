@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS EVENTS
 
 CREATE TABLE IF NOT EXISTS EVENTS_COMPILATIONS
 (
-    compilation_id BIGINT,
-    event_id       BIGINT,
+    compilation_id BIGINT REFERENCES COMPILATIONS(id),
+    event_id       BIGINT REFERENCES EVENTS(id),
     primary key (compilation_id, event_id)
 );
 
