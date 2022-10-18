@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewmmain.categories.model.CategoryDto;
-import ru.practicum.ewmmain.locations.model.Location;
 import ru.practicum.ewmmain.users.model.UserShortDto;
 
 import java.time.LocalDateTime;
