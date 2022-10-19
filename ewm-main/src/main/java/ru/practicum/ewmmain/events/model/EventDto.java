@@ -18,14 +18,14 @@ public class EventDto {
     private CategoryDto category;
     private String description;
     private LocalDateTime created;
-    private LocalDateTime event_date;
+    private LocalDateTime eventDate;
     private LocalDateTime published;
-    private Location location_id;
+    private Location locationId;
     private Boolean paid;
-    private Integer participant_limit;
-    private Boolean request_moderation;
-    private Integer confirmed_requests;
+    private Integer participantLimit;
+    private Boolean requestModeration;
+    private Integer confirmedRequests;
     private UserShortDto initiator;
-    private String state;
+    private State state;
     private Long views;
 }

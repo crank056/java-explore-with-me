@@ -21,8 +21,10 @@ public class Compilation {
     private Boolean pinned;
     @Column(nullable = false)
     private String tittle;
-    @ManyToMany
-    @JoinColumn(name = "compilation_id", referencedColumnName = "id")
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name = "EVENTS_COMPILATIONS",
+            joinColumns = {@JoinColumn(name = "compilation_id")},
+            inverseJoinColumns = {@JoinColumn(name = "event_id")})
     private List<Event> eventList;
 }
 

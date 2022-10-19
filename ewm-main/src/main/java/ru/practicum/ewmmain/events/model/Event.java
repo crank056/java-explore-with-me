@@ -29,23 +29,25 @@ public class Event {
     private String description;
     @Column(nullable = false)
     private LocalDateTime created;
-    @Column(nullable = false)
-    private LocalDateTime event_date;
+    @Column(nullable = false, name = "event_date")
+    private LocalDateTime eventDate;
     private LocalDateTime published;
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
-    private Location location_id;
+    private Location location;
     @Column(nullable = false)
     private Boolean paid;
-    @Column(nullable = false)
-    private Integer participant_limit;
-    @Column(nullable = false)
-    private Boolean request_moderation;
-    private Integer confirmed_requests;
+    @Column(nullable = false, name = "participant_limit")
+    private Integer participantLimit;
+    @Column(nullable = false, name = "request_moderation")
+    private Boolean requestModeration;
+    @Column(name = "confirmed_requests")
+    private Integer confirmedRequests;
     @ManyToOne
     @JoinColumn(name = "initiator_id", referencedColumnName = "id")
     private User initiator;
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private State state;
     private Long views;
 }
 

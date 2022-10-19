@@ -12,10 +12,31 @@ public class EventMapper {
                 event.getAnnotations(),
                 CategoryMapper.toDto(event.getCategory()),
                 event.getDescription(),
-                event.getEvent_date(),
+                event.getEventDate(),
                 event.getPaid(),
-                event.getConfirmed_requests(),
+                event.getConfirmedRequests(),
                 UserMapper.toUserShortDto(event.getInitiator()),
+                event.getViews()
+        );
+    }
+
+    public static EventDto toDto(Event event) {
+        return new EventDto(
+                event.getId(),
+                event.getTittle(),
+                event.getAnnotations(),
+                CategoryMapper.toDto(event.getCategory()),
+                event.getDescription(),
+                event.getCreated(),
+                event.getEventDate(),
+                event.getPublished(),
+                event.getLocationId(),
+                event.getPaid(),
+                event.getParticipantLimit(),
+                event.getRequest_moderation(),
+                event.getConfirmedRequests(),
+                UserMapper.toUserShortDto(event.getInitiator()),
+                event.getState(),
                 event.getViews()
         );
     }
