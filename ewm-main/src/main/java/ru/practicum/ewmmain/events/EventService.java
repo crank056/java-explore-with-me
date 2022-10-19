@@ -1,5 +1,7 @@
 package ru.practicum.ewmmain.events;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmmain.categories.CategoryRepository;
 import ru.practicum.ewmmain.events.model.*;
@@ -11,6 +13,8 @@ import ru.practicum.ewmmain.exceptions.ValidationException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -21,7 +25,8 @@ public class EventService {
     private final LocationRepository locationRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public EventService(EventRepository eventRepository, CategoryRepository categoryRepository, LocationRepository locationRepository) {
+    public EventService(EventRepository eventRepository, CategoryRepository categoryRepository,
+                        LocationRepository locationRepository) {
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
@@ -34,8 +39,10 @@ public class EventService {
         return null;
     }
 
-    public EventShortDto getFromIdPublic(Long id) {
-        //добавить проверку на опубликованность
+    public EventShortDto getFromIdPublic(Long id) throws NotFoundException, StateException {
+        if(!eventRepository.existsById(id)) throw new NotFoundException("Не найдено");
+        if(!eventRepository.getReferenceById(id).getPublished().equals(State.PUBLISHED))
+            throw new StateException("Не опубликовано");
         //добавить колвичество завпросов
         //добавить сохранение статистики
         return EventMapper.toShort(eventRepository.getReferenceById(id));
@@ -72,7 +79,7 @@ public class EventService {
         Location location = new Location();
         if (updateEventRequest.getLocation() != null) {
             location = locationRepository.findByLatAndLon(
-                    updateEventRequest.getLocation().getLat(), updateEventRequest.getLocation().getLon());
+                updateEventRequest.getLocation().getLat(), updateEventRequest.getLocation().getLon());
         }
         if (location == null) location = locationRepository.save(updateEventRequest.getLocation());
         event.setLocation(location);
@@ -88,9 +95,43 @@ public class EventService {
     }
 
     public List<EventDto> getAllAdmin(Long[] users, String[] states,
-                                Long[] categories, String rangeStart,
-                                String rangeEnd,int from, int size) {
-        return null;
+                                      Long[] categories, String rangeStart,
+                                      String rangeEnd, int from, int size) {
+        List<Event> list;
+        LocalDateTime start;
+        LocalDateTime end;
+        Pageable page = PageRequest.of(from / size, size);
+        if (rangeStart == null) {
+            start = LocalDateTime.now();
+        } else start = LocalDateTime.parse(rangeStart, formatter);
+        if (rangeEnd != null) {
+            end = LocalDateTime.parse(rangeEnd, formatter);
+            list = eventRepository.findAllByEventDateIsAfterAndEventDateIsBefore(start, end, page).getContent();
+        } else list = eventRepository.findAllByEventDateIsAfter(start, page).getContent();
+
+        if (users != null) {
+            List<Long> usersList = Arrays.asList(users);
+            for(Event event: list) {
+                if(!usersList.contains(event.getInitiator().getId())) list.remove(event);
+            }
+        }
+        if (states != null) {
+            List<String> statesList = Arrays.asList(states);
+            for(Event event: list) {
+                if(!statesList.contains(event.getState().toString())) list.remove(event);
+            }
+        }
+        if (categories != null) {
+            List<Long> categoriesList = Arrays.asList(categories);
+            for (Event event: list) {
+                if(!categoriesList.contains(event.getCategory().getId())) list.remove(event);
+            }
+        }
+        List<EventDto> eventDtoList = new ArrayList<>();
+        for(Event event: list) {
+            eventDtoList.add(EventMapper.toDto(event));
+        }
+        return eventDtoList;
     }
 
     private void existAndNotPublishedEvent(Long eventId) throws StateException, NotFoundException {

@@ -3,6 +3,8 @@ package ru.practicum.ewmmain.events.controllers;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.events.EventService;
 import ru.practicum.ewmmain.events.model.EventShortDto;
+import ru.practicum.ewmmain.exceptions.NotFoundException;
+import ru.practicum.ewmmain.exceptions.StateException;
 
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class EventControllerPublic {
     }
 
     @GetMapping("/{id}")
-    public EventShortDto getFromIdPublic(@PathVariable Long id) {
+    public EventShortDto getFromIdPublic(@PathVariable Long id) throws NotFoundException, StateException {
         return eventService.getFromIdPublic(id);
     }
 }
