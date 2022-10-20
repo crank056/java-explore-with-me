@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.events.EventService;
 import ru.practicum.ewmmain.events.model.EventDto;
 import ru.practicum.ewmmain.events.model.EventShortDto;
+import ru.practicum.ewmmain.events.model.UpdateEventRequest;
+import ru.practicum.ewmmain.exceptions.NotFoundException;
 
 import java.util.List;
 
@@ -18,12 +20,12 @@ public class EventControllerUser {
     }
 
     @GetMapping
-    public List<EventShortDto> getAllFromUser(@PathVariable Long userId, int from, int size) {
+    public List<EventShortDto> getAllFromUser(@PathVariable Long userId, int from, int size) throws NotFoundException {
         return eventService.getAllFromUser(userId, from, size);
     }
 
     @PatchMapping
-    public EventDto refreshFromUser(@PathVariable Long userId, @RequestBody EventShortDto eventShortDto) {
+    public EventDto refreshFromUser(@PathVariable Long userId, @RequestBody UpdateEventRequest eventRequest) {
         return eventService.refreshFromUser(userId, eventShortDto);
     }
 

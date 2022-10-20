@@ -10,6 +10,7 @@ import ru.practicum.ewmmain.events.repositories.LocationRepository;
 import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.StateException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
+import ru.practicum.ewmmain.users.UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,13 +24,15 @@ public class EventService {
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
+    private final UserRepository userRepository;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public EventService(EventRepository eventRepository, CategoryRepository categoryRepository,
-                        LocationRepository locationRepository) {
+                        LocationRepository locationRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
+        this.userRepository = userRepository;
     }
 
     public List<EventShortDto> getAllPublic(String text, Long[] categories,
@@ -133,6 +136,19 @@ public class EventService {
         }
         return eventDtoList;
     }
+
+    public List<EventShortDto> getAllFromUser(Long userId, int from, int size) throws NotFoundException {
+        if(!userRepository.existsById(userId)) throw new NotFoundException("Пользователь несуществует");
+        Pageable page = PageRequest.of(from / size, size);
+        List<Event> list = eventRepository.findAllByInitiatorId(userId, page).getContent();
+        List<EventShortDto> dtoList = new ArrayList<>();
+        for (Event event: list) {
+            dtoList.add(EventMapper.toShort(event));
+        }
+        return dtoList;
+    }
+
+    public EventDto refreshFromUser(Long userId, UpdateEventRequest)
 
     private void existAndNotPublishedEvent(Long eventId) throws StateException, NotFoundException {
         if (!eventRepository.existsById(eventId)) throw new NotFoundException("Мероприятия не существует");
