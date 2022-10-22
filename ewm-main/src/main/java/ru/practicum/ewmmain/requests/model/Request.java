@@ -27,6 +27,6 @@ public class Request {
     @JoinColumn(name = "requester_id", referencedColumnName = "id")
     private User requester;
     @Column(nullable = false)
-    private Boolean status;
+    private Status status;
 }
 

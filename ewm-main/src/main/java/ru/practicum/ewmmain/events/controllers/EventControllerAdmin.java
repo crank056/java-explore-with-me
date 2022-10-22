@@ -32,7 +32,8 @@ public class EventControllerAdmin {
     }
 
     @PutMapping("/{eventId}")
-    public EventDto editEvent(@PathVariable Long eventId, @RequestBody AdminUpdateEventRequest updateEventRequest) throws NotFoundException {
+    public EventDto editEvent(@PathVariable Long eventId, @RequestBody AdminUpdateEventRequest updateEventRequest)
+        throws NotFoundException {
         return eventService.editEventAdmin(eventId, updateEventRequest);
     }
 

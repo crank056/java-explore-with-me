@@ -26,4 +26,14 @@ public class RequestMapper {
                 request.getStatus()
         );
     }
+
+    public static ParticipationRequestDto toPRDto(Request request) {
+        return new ParticipationRequestDto(
+            request.getId(),
+            request.getCreated().toString(),
+            request.getEvent().getId(),
+            request.getRequester().getId(),
+            request.getStatus().toString()
+        );
+    }
 }

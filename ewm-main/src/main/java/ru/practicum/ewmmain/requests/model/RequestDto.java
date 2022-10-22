@@ -16,6 +16,6 @@ public class RequestDto {
         private LocalDateTime created;
         private EventShortDto event;
         private UserShortDto requester;
-        private Boolean status;
+        private Status status;
     }
 
