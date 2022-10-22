@@ -3,6 +3,7 @@ package ru.practicum.ewmmain.compilations;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.compilations.model.CompilationDto;
 import ru.practicum.ewmmain.compilations.model.NewCompilationDto;
+import ru.practicum.ewmmain.exceptions.NotFoundException;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class CompilationController {
     }
 
     @GetMapping("/compilations/{compId}")
-    public CompilationDto getByIdPublic(@PathVariable Long compId) {
+    public CompilationDto getByIdPublic(@PathVariable Long compId) throws NotFoundException {
         return compilationService.getByIdPublic(compId);
     }
 
@@ -34,27 +35,28 @@ public class CompilationController {
     }
 
     @DeleteMapping("/admin/compilations/{compId}")
-    public boolean deleteCompilation(@PathVariable Long compId) {
+    public boolean deleteCompilation(@PathVariable Long compId) throws NotFoundException {
         return compilationService.deleteCompilation(compId);
     }
 
     @DeleteMapping("/admin/compilations/{compId}/events/{eventId}")
-    public boolean deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId) {
+    public boolean deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId)
+        throws NotFoundException {
         return compilationService.deleteEventFromCompilation(compId, eventId);
     }
 
     @PatchMapping("/admin/compilations/{compId}/events/{eventId}")
-    public CompilationDto addEventToCompilation(@PathVariable long compId, @PathVariable long eventId) {
-        return compilationService.addEventToCompilation(compId, eventId);
+    public void addEventToCompilation(@PathVariable long compId, @PathVariable long eventId) throws NotFoundException {
+        compilationService.addEventToCompilation(compId, eventId);
     }
 
     @DeleteMapping("/admin/compilations/{compId}/pin")
-    public boolean unpin(@PathVariable long compId) {
-        return compilationService.unpin(compId);
+    public void unPin(@PathVariable long compId) throws NotFoundException {
+        compilationService.unPin(compId);
     }
 
     @PatchMapping("/admin/compilations/{compId}/pin")
-    public boolean pin(@PathVariable long compId) {
-        return compilationService.pin(compId);
+    public void pin(@PathVariable long compId) throws NotFoundException {
+        compilationService.pin(compId);
     }
 }
