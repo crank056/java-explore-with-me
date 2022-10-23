@@ -3,8 +3,11 @@ package ru.practicum.ewmmain.events;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmmain.categories.CategoryRepository;
+import ru.practicum.ewmmain.client.EventClient;
 import ru.practicum.ewmmain.events.model.*;
 import ru.practicum.ewmmain.events.repositories.EventRepository;
 import ru.practicum.ewmmain.events.repositories.LocationRepository;
@@ -14,6 +17,7 @@ import ru.practicum.ewmmain.exceptions.ValidationException;
 import ru.practicum.ewmmain.exceptions.WrongTimeException;
 import ru.practicum.ewmmain.users.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,15 +33,18 @@ public class EventService {
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
 
+    private final EventClient eventClient;
+
     private final EventMapper eventMapper;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public EventService(EventRepository eventRepository, CategoryRepository categoryRepository,
-                        LocationRepository locationRepository, UserRepository userRepository) {
+                        LocationRepository locationRepository, UserRepository userRepository, EventClient eventClient) {
         this.eventRepository = eventRepository;
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository;
         this.userRepository = userRepository;
+        this.eventClient = eventClient;
     }
 
     public List<EventShortDto> getAllPublic(String text, Long[] categories,
@@ -47,12 +54,15 @@ public class EventService {
         return null;
     }
 
-    public EventShortDto getFromIdPublic(Long id) throws NotFoundException, StateException {
+    public EventShortDto getFromIdPublic(Long id, HttpServletRequest request) throws NotFoundException, StateException {
         if (!eventRepository.existsById(id)) throw new NotFoundException("Не найдено");
-        if (!eventRepository.getReferenceById(id).getPublished().equals(State.PUBLISHED))
-            throw new StateException("Не опубликовано");
-        //добавить колвичество завпросов
-        //добавить сохранение статистики
+
+        Event event = eventRepository.getReferenceById(id);
+        if (!event.getState().equals(State.PUBLISHED)) throw new StateException("Не опубликовано");
+        ResponseEntity<Object> responseEntity = eventClient.sendToStatistics(new EndpointHitDto(
+                "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(formatter)));
+        if(responseEntity.getStatusCode().equals(HttpStatus.ACCEPTED)) event.setViews(event.getViews()+1);\
+        eventRepository.save(event);
         return EventMapper.toShort(eventRepository.getReferenceById(id));
     }
 

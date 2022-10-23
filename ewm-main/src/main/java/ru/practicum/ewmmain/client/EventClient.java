@@ -8,6 +8,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.ewmmain.compilations.model.EndpointHit;
+import ru.practicum.ewmmain.events.model.EndpointHitDto;
 
 @Service
 public class EventClient extends BaseClient {
@@ -23,7 +24,7 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> sendToStatistics (EndpointHit endpointHit) {
-        return post("", endpointHit);
+    public ResponseEntity<Object> sendToStatistics(EndpointHitDto endpointHitDto) {
+        return post("", endpointHitDto);
     }
 }

@@ -6,6 +6,8 @@ import ru.practicum.ewmmain.events.model.EventShortDto;
 import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.StateException;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -32,7 +34,7 @@ public class EventControllerPublic {
     }
 
     @GetMapping("/{id}")
-    public EventShortDto getFromIdPublic(@PathVariable Long id) throws NotFoundException, StateException {
-        return eventService.getFromIdPublic(id);
+    public EventShortDto getFromIdPublic(@PathVariable Long id, HttpServletRequest request) throws NotFoundException, StateException {
+        return eventService.getFromIdPublic(id, request);
     }
 }
