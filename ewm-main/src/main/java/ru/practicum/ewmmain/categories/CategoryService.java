@@ -11,6 +11,7 @@ import ru.practicum.ewmmain.exceptions.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -38,11 +39,7 @@ public class CategoryService {
         validatePageSize(from, size);
         Pageable page = PageRequest.of(from / size, size, Sort.by("id").descending());
         List<Category> categories = categoryRepository.findAll(page).getContent();
-        List<CategoryDto> categoryDto = new ArrayList<>();
-        for(Category category: categories) {
-            categoryDto.add(CategoryMapper.toDto(category));
-        }
-        return categoryDto;
+        return categories.stream().map(category -> CategoryMapper.toDto(category)).collect(Collectors.toList());
     }
 
     public CategoryDto getFromId(Long catId) {

@@ -23,7 +23,8 @@ public class EventControllerUser {
     }
 
     @GetMapping
-    public List<EventShortDto> getAllFromUser(@PathVariable Long userId, int from, int size) throws NotFoundException {
+    public List<EventShortDto> getAllFromUser(@PathVariable Long userId, int from, int size)
+        throws NotFoundException {
         return eventService.getAllFromUser(userId, from, size);
     }
 

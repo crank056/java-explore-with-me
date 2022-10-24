@@ -5,7 +5,6 @@ import ru.practicum.ewmmain.exceptions.AccessException;
 import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
 import ru.practicum.ewmmain.requests.model.ParticipationRequestDto;
-import ru.practicum.ewmmain.requests.model.RequestDto;
 
 import java.util.List;
 
@@ -52,7 +51,8 @@ public class RequestController {
     }
 
     @PatchMapping("/requests/{requestId}/cancel")
-    public RequestDto cancelRequest(@PathVariable long userId, @PathVariable long requestId) {
+    public ParticipationRequestDto cancelRequest(@PathVariable long userId, @PathVariable long requestId)
+        throws AccessException, NotFoundException {
         return requestService.cancelRequest(userId, requestId);
     }
 }

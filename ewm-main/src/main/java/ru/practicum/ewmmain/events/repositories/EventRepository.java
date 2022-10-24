@@ -17,7 +17,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findAllByInitiatorId(Long initiatorId, Pageable pageable);
 
-    Page<Event> findAllByEventDateBetweenAndState(LocalDateTime start, LocalDateTime end, State state, Pageable page);
+    Page<Event> findAllByEventDateBetweenAndState(
+        LocalDateTime start, LocalDateTime end, State state, Pageable page);
 
     Page<Event> findAllByEventDateIsAfterAndState(LocalDateTime start, State state, Pageable page);
 

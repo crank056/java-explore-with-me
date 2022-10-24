@@ -13,6 +13,7 @@ import ru.practicum.ewmmain.exceptions.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CompilationService {
@@ -32,11 +33,8 @@ public class CompilationService {
         } else {
             list = compilationRepository.findAll(page).getContent();
         }
-        List<CompilationDto> listDto = new ArrayList<>();
-        for (Compilation compilation : list) {
-            CompilationMapper.toDto(compilation);
-        }
-        return listDto;
+        return list.stream()
+            .map(compilation -> CompilationMapper.toDto(compilation)).collect(Collectors.toList());
     }
 
     public CompilationDto getByIdPublic(Long id) throws NotFoundException {

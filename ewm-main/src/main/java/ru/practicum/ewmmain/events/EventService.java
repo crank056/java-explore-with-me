@@ -21,7 +21,6 @@ import ru.practicum.ewmmain.users.UserRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,11 +84,10 @@ public class EventService {
             list = list.stream().filter(event -> event.getConfirmedRequests() < event.getParticipantLimit())
                     .collect(Collectors.toList());
         }
-        ResponseEntity<Object> responseEntity = eventClient.sendToStatistics(new EndpointHitDto(
-                "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(formatter)));
-        List<EventShortDto> dtoList = new ArrayList<>();
-        dtoList = list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
-        return dtoList;
+        eventClient.sendToStatistics(new EndpointHitDto(
+                "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(
+                    formatter)));
+        return list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
     }
 
     public EventShortDto getFromIdPublic(Long id, HttpServletRequest request) throws NotFoundException, StateException {
@@ -182,22 +180,14 @@ public class EventService {
                 if (!categoriesList.contains(event.getCategory().getId())) list.remove(event);
             }
         }
-        List<EventDto> eventDtoList = new ArrayList<>();
-        for (Event event : list) {
-            eventDtoList.add(EventMapper.toDto(event));
-        }
-        return eventDtoList;
+        return list.stream().map(event -> EventMapper.toDto(event)).collect(Collectors.toList());
     }
 
     public List<EventShortDto> getAllFromUser(Long userId, int from, int size) throws NotFoundException {
         if (!userRepository.existsById(userId)) throw new NotFoundException("Пользователь несуществует");
         Pageable page = PageRequest.of(from / size, size);
         List<Event> list = eventRepository.findAllByInitiatorId(userId, page).getContent();
-        List<EventShortDto> dtoList = new ArrayList<>();
-        for (Event event : list) {
-            dtoList.add(EventMapper.toShort(event));
-        }
-        return dtoList;
+        return list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
     }
 
     public EventDto refreshFromUser(Long userId, UpdateEventRequest updateEventRequest)
@@ -225,6 +215,7 @@ public class EventService {
         LocalDateTime time = LocalDateTime.parse(newEventDto.getEventDate());
         if (time.isAfter(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
                 "Начало не может быть ранее чем через 2 часа");
+        // тут фигня какая-то
         return EventMapper.toDto(eventRepository.save(new EventMapper(userRepository, categoryRepository,
                 eventRepository, locationRepository).fromNewToEntity(userId, newEventDto)));
     }

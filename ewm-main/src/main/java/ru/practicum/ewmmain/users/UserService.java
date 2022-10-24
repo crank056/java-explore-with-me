@@ -10,8 +10,8 @@ import ru.practicum.ewmmain.users.model.User;
 import ru.practicum.ewmmain.users.model.UserDto;
 import ru.practicum.ewmmain.users.model.UserMapper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -34,11 +34,7 @@ public class UserService {
         if (ids.size() > 0) {
             users = userRepository.findAllById(ids);
         } else users = userRepository.findAll(page).getContent();
-        List<UserDto> usersDto = new ArrayList<>();
-        for (User user : users) {
-            usersDto.add(UserMapper.toUserDto(user));
-        }
-        return usersDto;
+        return users.stream().map(user -> UserMapper.toUserDto(user)).collect(Collectors.toList());
     }
 
     public boolean deleteUser(Long userId) {

@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.events.EventService;
 import ru.practicum.ewmmain.events.model.AdminUpdateEventRequest;
 import ru.practicum.ewmmain.events.model.EventDto;
-import ru.practicum.ewmmain.events.model.EventShortDto;
 import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.StateException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
