@@ -4,15 +4,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.ewmmain.events.model.Event;
+import ru.practicum.ewmmain.events.model.State;
 
 import java.time.LocalDateTime;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    public Page<Event> findAllByEventDateIsAfter(LocalDateTime start, Pageable page);
+    Page<Event> findAllByEventDateIsAfter(LocalDateTime start, Pageable page);
 
-    public Page<Event> findAllByEventDateIsAfterAndEventDateIsBefore(
+    Page<Event> findAllByEventDateIsAfterAndEventDateIsBefore(
         LocalDateTime start, LocalDateTime end, Pageable page);
 
-    public Page<Event> findAllByInitiatorId(Long inititiatorId, Pageable pageable);
+    Page<Event> findAllByInitiatorId(Long initiatorId, Pageable pageable);
+
+    Page<Event> findAllByEventDateBetweenAndState(LocalDateTime start, LocalDateTime end, State state, Pageable page);
+
+    Page<Event> findAllByEventDateIsAfterAndState(LocalDateTime start, State state, Pageable page);
+
+
 }

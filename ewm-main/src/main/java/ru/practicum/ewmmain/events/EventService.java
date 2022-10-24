@@ -3,6 +3,7 @@ package ru.practicum.ewmmain.events;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,18 +52,53 @@ public class EventService {
     public List<EventShortDto> getAllPublic(String text, Long[] categories,
                                             Boolean paid, String rangeStart,
                                             String rangeEnd, Boolean onlyAvailable,
-                                            String sort, int from, int size) {
-        return null;
+                                            String sort, int from, int size, HttpServletRequest request) {
+        List<Event> list;
+        LocalDateTime start;
+        LocalDateTime end;
+        Pageable page = PageRequest.of(
+                from / size, size, Sort.by(sort.equals("EVENT_DATE") ? "eventDate" : "views").ascending());
+        if(rangeEnd == null && rangeStart == null) {
+            start = LocalDateTime.now();
+            list = eventRepository.findAllByEventDateIsAfterAndState(start, State.PUBLISHED, page).getContent();
+        } else {
+            start = LocalDateTime.parse(rangeStart, formatter);
+            end = LocalDateTime.parse(rangeEnd, formatter);
+            list = eventRepository.findAllByEventDateBetweenAndState(start, end, State.PUBLISHED, page).getContent();
+        }
+        if(text != null) {
+            list = list.stream().filter(event -> event.getDescription().toLowerCase()
+                    .contains(text.toLowerCase()) || event.getAnnotations().toLowerCase()
+                    .contains(text.toLowerCase())).collect(Collectors.toList());
+        }
+        if(categories != null) {
+            List<Long> categoryId = List.of(categories);
+            list = list.stream().filter(event -> categoryId.contains(event.getCategory().getId()))
+                    .collect(Collectors.toList());
+        }
+        if(paid != null) {
+            if(paid) {
+                list = list.stream().filter(event -> event.getPaid()).collect(Collectors.toList());
+            } else list = list.stream().filter(event -> !event.getPaid()).collect(Collectors.toList());
+        }
+        if(onlyAvailable) {
+            list = list.stream().filter(event -> event.getConfirmedRequests() < event.getParticipantLimit())
+                    .collect(Collectors.toList());
+        }
+        ResponseEntity<Object> responseEntity = eventClient.sendToStatistics(new EndpointHitDto(
+                "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(formatter)));
+        List<EventShortDto> dtoList = new ArrayList<>();
+        dtoList = list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
+        return dtoList;
     }
 
     public EventShortDto getFromIdPublic(Long id, HttpServletRequest request) throws NotFoundException, StateException {
         if (!eventRepository.existsById(id)) throw new NotFoundException("Не найдено");
-
         Event event = eventRepository.getReferenceById(id);
         if (!event.getState().equals(State.PUBLISHED)) throw new StateException("Не опубликовано");
         ResponseEntity<Object> responseEntity = eventClient.sendToStatistics(new EndpointHitDto(
                 "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(formatter)));
-        if(responseEntity.getStatusCode().equals(HttpStatus.ACCEPTED)) event.setViews(event.getViews()+1);\
+        if (responseEntity.getStatusCode().equals(HttpStatus.ACCEPTED)) event.setViews(event.getViews() + 1);
         eventRepository.save(event);
         return EventMapper.toShort(eventRepository.getReferenceById(id));
     }
@@ -97,7 +134,7 @@ public class EventService {
         Location location = new Location();
         if (updateEventRequest.getLocation() != null) {
             location = locationRepository.findByLatAndLon(
-                updateEventRequest.getLocation().getLat(), updateEventRequest.getLocation().getLon());
+                    updateEventRequest.getLocation().getLat(), updateEventRequest.getLocation().getLon());
         }
         if (location == null) location = locationRepository.save(updateEventRequest.getLocation());
         event.setLocation(location);
@@ -164,15 +201,15 @@ public class EventService {
     }
 
     public EventDto refreshFromUser(Long userId, UpdateEventRequest updateEventRequest)
-        throws NotFoundException, StateException, WrongTimeException {
+            throws NotFoundException, StateException, WrongTimeException {
         if (!userRepository.existsById(userId)) throw new NotFoundException("Пользователь несуществует");
         existAndNotPublishedEvent(updateEventRequest.getEventId());
         Event event = eventRepository.getReferenceById(updateEventRequest.getEventId());
         if (!event.getState().equals(State.CANCELED) || !event.getState().equals(State.PENDING))
             throw new StateException("Статус опубликовано, редактирование невозможно");
         if (LocalDateTime.parse(updateEventRequest.getEventDate(), formatter)
-            .isBefore(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
-            "Дата начала не раньше чем через 2 часа");
+                .isBefore(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
+                "Дата начала не раньше чем через 2 часа");
         event.setState(State.PENDING);
         event.setAnnotations(updateEventRequest.getAnnotation());
         event.setCategory(categoryRepository.getReferenceById(updateEventRequest.getCategory()));
@@ -187,9 +224,9 @@ public class EventService {
     public EventDto createEventFromUser(Long userId, NewEventDto newEventDto) throws WrongTimeException {
         LocalDateTime time = LocalDateTime.parse(newEventDto.getEventDate());
         if (time.isAfter(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
-            "Начало не может быть ранее чем через 2 часа");
+                "Начало не может быть ранее чем через 2 часа");
         return EventMapper.toDto(eventRepository.save(new EventMapper(userRepository, categoryRepository,
-            eventRepository, locationRepository).fromNewToEntity(userId, newEventDto));
+                eventRepository, locationRepository).fromNewToEntity(userId, newEventDto)));
     }
 
     public EventDto getEventFromIdByUser(Long userId, Long eventId) throws NotFoundException {
@@ -202,7 +239,7 @@ public class EventService {
         if (!userRepository.existsById(userId)) throw new NotFoundException("Пользователь несуществует");
         if (!eventRepository.existsById(eventId)) throw new NotFoundException("Мероприятие не существует");
         Event event = eventRepository.getReferenceById(eventId);
-        if(!event.getState().equals(State.PENDING))
+        if (!event.getState().equals(State.PENDING))
             throw new StateException("Отменить событие можно только в статусе модерации");
         event.setState(State.CANCELED);
         return EventMapper.toDto(eventRepository.save(event));
