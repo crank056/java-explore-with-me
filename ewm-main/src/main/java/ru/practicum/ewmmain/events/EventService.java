@@ -26,17 +26,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class EventService {
 
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
-
     private final EventClient eventClient;
-
-    private final EventMapper eventMapper;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public EventService(EventRepository eventRepository, CategoryRepository categoryRepository,
@@ -215,9 +211,8 @@ public class EventService {
         LocalDateTime time = LocalDateTime.parse(newEventDto.getEventDate());
         if (time.isAfter(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
                 "Начало не может быть ранее чем через 2 часа");
-        // тут фигня какая-то
-        return EventMapper.toDto(eventRepository.save(new EventMapper(userRepository, categoryRepository,
-                eventRepository, locationRepository).fromNewToEntity(userId, newEventDto)));
+        return EventMapper.toDto(eventRepository.save(EventMapper.fromNewToEntity(userId,
+            newEventDto, locationRepository, categoryRepository, userRepository)));
     }
 
     public EventDto getEventFromIdByUser(Long userId, Long eventId) throws NotFoundException {

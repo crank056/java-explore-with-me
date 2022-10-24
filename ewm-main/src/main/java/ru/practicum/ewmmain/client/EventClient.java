@@ -14,7 +14,7 @@ public class EventClient extends BaseClient {
     private static final String API_PREFIX = "/hit";
 
     @Autowired
-    public EventClient(@Value("${stats.url}") String serverUrl, RestTemplateBuilder builder) {
+    public EventClient(@Value("http://localhost:9090") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))

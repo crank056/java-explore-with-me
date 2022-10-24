@@ -16,19 +16,6 @@ import java.time.format.DateTimeFormatter;
 
 @Service
 public class EventMapper {
-    private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
-    private final EventRepository eventRepository;
-    private final LocationRepository locationRepository;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-    public EventMapper(UserRepository userRepository, CategoryRepository categoryRepository,
-                       EventRepository eventRepository, LocationRepository locationRepository) {
-        this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
-        this.eventRepository = eventRepository;
-        this.locationRepository = locationRepository;
-    }
 
     public static EventShortDto toShort(Event event) {
         return new EventShortDto(
@@ -66,12 +53,16 @@ public class EventMapper {
         );
     }
 
-    public Event fromNewToEntity(Long userId, NewEventDto newEventDto) throws WrongTimeException {
+    public static Event fromNewToEntity(Long userId, NewEventDto newEventDto,
+                                        LocationRepository locationRepository,
+                                        CategoryRepository categoryRepository,
+                                        UserRepository userRepository) throws WrongTimeException {
         Event event = new Event();
         Location location = locationRepository.findByLatAndLon(
             newEventDto.getLocation().getLat(), newEventDto.getLocation().getLon());
         if (location == null) locationRepository.save(newEventDto.getLocation());
         User initiator = userRepository.getReferenceById(userId);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(newEventDto.getEventDate(), formatter);
         if (date.isBefore(LocalDateTime.now().plusHours(2))) throw new WrongTimeException("Неверное имя");
         event.setAnnotations(newEventDto.getAnnotation());
@@ -90,6 +81,4 @@ public class EventMapper {
         event.setViews(0L);
         return event;
     }
-
-
 }
