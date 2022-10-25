@@ -19,7 +19,7 @@ public class CompilationMapper {
             eventShortDtoList,
                 compilation.getId(),
                 compilation.getPinned(),
-                compilation.getTittle()
+                compilation.getTitle()
         );
     }
 }

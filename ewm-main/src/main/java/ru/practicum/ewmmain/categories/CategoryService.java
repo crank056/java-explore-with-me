@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewmmain.categories.model.Category;
 import ru.practicum.ewmmain.categories.model.CategoryDto;
 import ru.practicum.ewmmain.categories.model.CategoryMapper;
+import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
 
 import java.util.ArrayList;
@@ -42,7 +43,8 @@ public class CategoryService {
         return categories.stream().map(category -> CategoryMapper.toDto(category)).collect(Collectors.toList());
     }
 
-    public CategoryDto getFromId(Long catId) {
+    public CategoryDto getFromId(Long catId) throws NotFoundException {
+        if(!categoryRepository.existsById(catId)) throw new NotFoundException("Категория не существует");
         return CategoryMapper.toDto(categoryRepository.getReferenceById(catId));
     }
 

@@ -53,7 +53,7 @@ public class EventService {
         LocalDateTime end;
         Pageable page = PageRequest.of(
                 from / size, size, Sort.by(sort.equals("EVENT_DATE") ? "eventDate" : "views").ascending());
-        if(rangeEnd == null && rangeStart == null) {
+        if (rangeEnd == null && rangeStart == null) {
             start = LocalDateTime.now();
             list = eventRepository.findAllByEventDateIsAfterAndState(start, State.PUBLISHED, page).getContent();
         } else {
@@ -61,28 +61,28 @@ public class EventService {
             end = LocalDateTime.parse(rangeEnd, formatter);
             list = eventRepository.findAllByEventDateBetweenAndState(start, end, State.PUBLISHED, page).getContent();
         }
-        if(text != null) {
+        if (text != null) {
             list = list.stream().filter(event -> event.getDescription().toLowerCase()
-                    .contains(text.toLowerCase()) || event.getAnnotations().toLowerCase()
+                    .contains(text.toLowerCase()) || event.getAnnotation().toLowerCase()
                     .contains(text.toLowerCase())).collect(Collectors.toList());
         }
-        if(categories != null) {
+        if (categories != null) {
             List<Long> categoryId = List.of(categories);
             list = list.stream().filter(event -> categoryId.contains(event.getCategory().getId()))
                     .collect(Collectors.toList());
         }
-        if(paid != null) {
-            if(paid) {
+        if (paid != null) {
+            if (paid) {
                 list = list.stream().filter(event -> event.getPaid()).collect(Collectors.toList());
             } else list = list.stream().filter(event -> !event.getPaid()).collect(Collectors.toList());
         }
-        if(onlyAvailable) {
+        if (onlyAvailable) {
             list = list.stream().filter(event -> event.getConfirmedRequests() < event.getParticipantLimit())
                     .collect(Collectors.toList());
         }
         eventClient.sendToStatistics(new EndpointHitDto(
                 "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(
-                    formatter)));
+                formatter)));
         return list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
     }
 
@@ -103,7 +103,7 @@ public class EventService {
         if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))
             throw new ValidationException("Мероприятие не может начаться ранее чем за час до времени публикации");
         event.setState(State.PUBLISHED);
-        event.setPublished(LocalDateTime.now());
+        event.setPublishedOn(LocalDateTime.now());
         return EventMapper.toDto(eventRepository.save(event));
     }
 
@@ -118,7 +118,7 @@ public class EventService {
         if (!eventRepository.existsById(eventId)) throw new NotFoundException("Мероприятия не существует");
         Event event = eventRepository.getReferenceById(eventId);
         if (updateEventRequest.getAnnotation() != null)
-            event.setAnnotations(updateEventRequest.getAnnotation());
+            event.setAnnotation(updateEventRequest.getAnnotation());
         if (updateEventRequest.getCategory() != null)
             event.setCategory(categoryRepository.getReferenceById(updateEventRequest.getCategory()));
         if (updateEventRequest.getDescription() != null)
@@ -127,11 +127,9 @@ public class EventService {
             event.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), formatter));
         Location location = new Location();
         if (updateEventRequest.getLocation() != null) {
-            location = locationRepository.findByLatAndLon(
-                    updateEventRequest.getLocation().getLat(), updateEventRequest.getLocation().getLon());
+            location = locationRepository.save(updateEventRequest.getLocation());
+            event.setLocation(location);
         }
-        if (location == null) location = locationRepository.save(updateEventRequest.getLocation());
-        event.setLocation(location);
         if (updateEventRequest.getPaid() != null)
             event.setPaid(updateEventRequest.getPaid());
         if (updateEventRequest.getParticipantLimit() != null)
@@ -139,7 +137,7 @@ public class EventService {
         if (updateEventRequest.getRequestModeration() != null)
             event.setRequestModeration(updateEventRequest.getRequestModeration());
         if (updateEventRequest.getTitle() != null)
-            event.setTittle(updateEventRequest.getTitle());
+            event.setTitle(updateEventRequest.getTitle());
         return EventMapper.toDto(eventRepository.save(event));
     }
 
@@ -160,30 +158,27 @@ public class EventService {
 
         if (users != null) {
             List<Long> usersList = Arrays.asList(users);
-            for (Event event : list) {
-                if (!usersList.contains(event.getInitiator().getId())) list.remove(event);
-            }
+            list = list.stream().filter(event -> !usersList.contains(event.getInitiator().getId()))
+                    .collect(Collectors.toList());
         }
         if (states != null) {
             List<String> statesList = Arrays.asList(states);
-            for (Event event : list) {
-                if (!statesList.contains(event.getState().toString())) list.remove(event);
-            }
+            list = list.stream().filter(event -> !statesList.contains(event.getState().toString()))
+                    .collect(Collectors.toList());
         }
         if (categories != null) {
             List<Long> categoriesList = Arrays.asList(categories);
-            for (Event event : list) {
-                if (!categoriesList.contains(event.getCategory().getId())) list.remove(event);
-            }
+            list = list.stream().filter(event -> !categoriesList.contains(event.getCategory().getId()))
+                    .collect(Collectors.toList());
         }
-        return list.stream().map(event -> EventMapper.toDto(event)).collect(Collectors.toList());
+        return list.stream().map(EventMapper::toDto).collect(Collectors.toList());
     }
 
     public List<EventShortDto> getAllFromUser(Long userId, int from, int size) throws NotFoundException {
         if (!userRepository.existsById(userId)) throw new NotFoundException("Пользователь несуществует");
         Pageable page = PageRequest.of(from / size, size);
         List<Event> list = eventRepository.findAllByInitiatorId(userId, page).getContent();
-        return list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
+        return list.stream().map(EventMapper::toShort).collect(Collectors.toList());
     }
 
     public EventDto refreshFromUser(Long userId, UpdateEventRequest updateEventRequest)
@@ -197,22 +192,22 @@ public class EventService {
                 .isBefore(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
                 "Дата начала не раньше чем через 2 часа");
         event.setState(State.PENDING);
-        event.setAnnotations(updateEventRequest.getAnnotation());
+        event.setAnnotation(updateEventRequest.getAnnotation());
         event.setCategory(categoryRepository.getReferenceById(updateEventRequest.getCategory()));
         event.setDescription(updateEventRequest.getDescription());
         event.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate()));
         event.setPaid(updateEventRequest.isPaid());
         event.setParticipantLimit(updateEventRequest.getParticipantLimit());
-        event.setTittle(updateEventRequest.getTitle());
+        event.setTitle(updateEventRequest.getTitle());
         return EventMapper.toDto(eventRepository.save(event));
     }
 
     public EventDto createEventFromUser(Long userId, NewEventDto newEventDto) throws WrongTimeException {
-        LocalDateTime time = LocalDateTime.parse(newEventDto.getEventDate());
-        if (time.isAfter(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
+        LocalDateTime time = LocalDateTime.parse(newEventDto.getEventDate(), formatter);
+        if (time.isBefore(LocalDateTime.now().plusHours(2))) throw new WrongTimeException(
                 "Начало не может быть ранее чем через 2 часа");
         return EventMapper.toDto(eventRepository.save(EventMapper.fromNewToEntity(userId,
-            newEventDto, locationRepository, categoryRepository, userRepository)));
+                newEventDto, locationRepository, categoryRepository, userRepository)));
     }
 
     public EventDto getEventFromIdByUser(Long userId, Long eventId) throws NotFoundException {

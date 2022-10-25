@@ -20,7 +20,7 @@ public class Compilation {
     @Column(nullable = false)
     private Boolean pinned;
     @Column(nullable = false)
-    private String tittle;
+    private String title;
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "EVENTS_COMPILATIONS",
             joinColumns = {@JoinColumn(name = "compilation_id")},

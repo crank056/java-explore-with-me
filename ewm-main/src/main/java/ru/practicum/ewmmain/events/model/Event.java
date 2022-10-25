@@ -19,20 +19,20 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String tittle;
+    private String title;
     @Column(nullable = false)
-    private String annotations;
+    private String annotation;
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
-    private LocalDateTime created;
+    private LocalDateTime createdOn;
     @Column(nullable = false, name = "event_date")
     private LocalDateTime eventDate;
-    private LocalDateTime published;
-    @ManyToOne
+    private LocalDateTime publishedOn;
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
     @Column(nullable = false)

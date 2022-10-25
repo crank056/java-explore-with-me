@@ -13,14 +13,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class EventDto {
     private Long id;
-    private String tittle;
-    private String annotations;
+    private String title;
+    private String annotation;
     private CategoryDto category;
     private String description;
-    private LocalDateTime created;
+    private LocalDateTime createdOn;
     private LocalDateTime eventDate;
-    private LocalDateTime published;
-    private Location locationId;
+    private LocalDateTime publishedOn;
+    private Location location;
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;

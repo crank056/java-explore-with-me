@@ -2,6 +2,7 @@ package ru.practicum.ewmmain.categories;
 
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.categories.model.CategoryDto;
+import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class CategoryController {
     }
 
     @GetMapping("/categories/{catId}")
-    public CategoryDto getFromId(@PathVariable Long catId) {
+    public CategoryDto getFromId(@PathVariable Long catId) throws NotFoundException {
         return categoryService.getFromId(catId);
     }
 }

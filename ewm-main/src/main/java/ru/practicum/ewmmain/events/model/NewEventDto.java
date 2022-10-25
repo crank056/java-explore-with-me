@@ -14,5 +14,5 @@ public class NewEventDto {
     private boolean paid;
     private int participantLimit;
     private boolean requestModeration;
-    private String tittle;
+    private String title;
 }

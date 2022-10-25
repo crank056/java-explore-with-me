@@ -3,7 +3,6 @@ package ru.practicum.ewmmain.events.model;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmmain.categories.CategoryRepository;
 import ru.practicum.ewmmain.categories.model.CategoryMapper;
-import ru.practicum.ewmmain.events.repositories.EventRepository;
 import ru.practicum.ewmmain.events.repositories.LocationRepository;
 import ru.practicum.ewmmain.exceptions.WrongTimeException;
 import ru.practicum.ewmmain.users.UserRepository;
@@ -20,8 +19,8 @@ public class EventMapper {
     public static EventShortDto toShort(Event event) {
         return new EventShortDto(
                 event.getId(),
-                event.getTittle(),
-                event.getAnnotations(),
+                event.getTitle(),
+                event.getAnnotation(),
                 CategoryMapper.toDto(event.getCategory()),
                 event.getDescription(),
                 event.getEventDate(),
@@ -35,13 +34,13 @@ public class EventMapper {
     public static EventDto toDto(Event event) {
         return new EventDto(
                 event.getId(),
-                event.getTittle(),
-                event.getAnnotations(),
+                event.getTitle(),
+                event.getAnnotation(),
                 CategoryMapper.toDto(event.getCategory()),
                 event.getDescription(),
-                event.getCreated(),
+                event.getCreatedOn(),
                 event.getEventDate(),
-                event.getPublished(),
+                event.getPublishedOn(),
                 event.getLocation(),
                 event.getPaid(),
                 event.getParticipantLimit(),
@@ -65,10 +64,10 @@ public class EventMapper {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(newEventDto.getEventDate(), formatter);
         if (date.isBefore(LocalDateTime.now().plusHours(2))) throw new WrongTimeException("Неверное имя");
-        event.setAnnotations(newEventDto.getAnnotation());
+        event.setAnnotation(newEventDto.getAnnotation());
         event.setCategory(categoryRepository.getReferenceById(newEventDto.getCategory()));
         event.setConfirmedRequests(0);
-        event.setCreated(LocalDateTime.now());
+        event.setCreatedOn(LocalDateTime.now());
         event.setDescription(newEventDto.getDescription());
         event.setEventDate(date);
         event.setInitiator(initiator);
@@ -77,7 +76,7 @@ public class EventMapper {
         event.setParticipantLimit(newEventDto.getParticipantLimit());
         event.setRequestModeration(newEventDto.isRequestModeration());
         event.setState(State.PENDING);
-        event.setTittle(newEventDto.getTittle());
+        event.setTitle(newEventDto.getTitle());
         event.setViews(0L);
         return event;
     }

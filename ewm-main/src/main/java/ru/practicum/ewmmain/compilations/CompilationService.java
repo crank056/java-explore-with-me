@@ -50,7 +50,7 @@ public class CompilationService {
         }
         compilation.setEventList(list);
         compilation.setPinned(newCompilationDto.isPinned());
-        compilation.setTittle(newCompilationDto.getTitle());
+        compilation.setTitle(newCompilationDto.getTitle());
         return CompilationMapper.toDto(compilationRepository.save(compilation));
     }
 
@@ -60,21 +60,13 @@ public class CompilationService {
         return !compilationRepository.existsById(id);
     }
 
-    public Boolean deleteEventFromCompilation(Long compId, Long eventId) throws NotFoundException {
+    public void deleteEventFromCompilation(Long compId, Long eventId) throws NotFoundException {
         if (!compilationRepository.existsById(compId)) throw new NotFoundException("Компиляции не существует");
         Compilation compilation = compilationRepository.getReferenceById(compId);
-        boolean isExist = false;
         List<Event> list = compilation.getEventList();
-        for (Event event : list) {
-            if (event.getId().equals(eventId)) {
-                list.remove(event);
-                isExist = true;
-            }
-        }
-        if (!isExist) throw new NotFoundException("Такого мероприятия нет в подборке");
+        list = list.stream().filter(event -> !event.getId().equals(eventId)).collect(Collectors.toList());
         compilation.setEventList(list);
         compilationRepository.save(compilation);
-        return isExist;
     }
 
     public void addEventToCompilation(Long compId, Long eventId) throws NotFoundException {

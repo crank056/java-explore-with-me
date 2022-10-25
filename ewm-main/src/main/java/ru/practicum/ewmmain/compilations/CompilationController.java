@@ -40,9 +40,9 @@ public class CompilationController {
     }
 
     @DeleteMapping("/admin/compilations/{compId}/events/{eventId}")
-    public boolean deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId)
+    public void deleteEventFromCompilation(@PathVariable Long compId, @PathVariable Long eventId)
         throws NotFoundException {
-        return compilationService.deleteEventFromCompilation(compId, eventId);
+        compilationService.deleteEventFromCompilation(compId, eventId);
     }
 
     @PatchMapping("/admin/compilations/{compId}/events/{eventId}")

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class EventShortDto {
     private Long id;
-    private String tittle;
-    private String annotations;
+    private String title;
+    private String annotation;
     private CategoryDto category;
     private String description;
     private LocalDateTime eventDate;
