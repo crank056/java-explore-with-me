@@ -25,7 +25,7 @@ public class EventControllerAdmin {
         return eventService.publishEventAdmin(eventId);
     }
 
-    @GetMapping("/{eventId}/reject")
+    @PatchMapping("/{eventId}/reject")
     public EventDto rejectEvent(@PathVariable Long eventId) throws NotFoundException, StateException {
         return eventService.rejectEventAdmin(eventId);
     }

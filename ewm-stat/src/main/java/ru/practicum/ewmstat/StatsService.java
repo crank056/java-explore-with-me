@@ -8,6 +8,7 @@ import ru.practicum.ewmstat.model.ViewStats;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StatsService {
@@ -31,12 +32,9 @@ public class StatsService {
         } else list = statsRepository.getByTime(start, end);
         if (uris.length != 0) {
             List<String> uriList = List.of(uris);
-            for (ViewStats hit : list) {
-                if (!uriList.contains(hit.getUri())) {
-                    list.remove(hit);
-                }
+            list = list.stream().filter(viewStats -> uriList.contains(viewStats.getUri()))
+                .collect(Collectors.toList());
             }
-        }
         return list;
     }
 

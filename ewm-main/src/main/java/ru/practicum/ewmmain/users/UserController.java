@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getUsers(
-        @RequestBody List<Long> ids,
+        @RequestParam List<Long> ids,
         @RequestParam(required = false, defaultValue = "0") int from,
         @RequestParam(required = false, defaultValue = "10") int size) throws ValidationException {
         return userService.getUsers(ids, from, size);

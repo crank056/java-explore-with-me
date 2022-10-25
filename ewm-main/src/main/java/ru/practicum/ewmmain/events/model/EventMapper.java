@@ -59,7 +59,7 @@ public class EventMapper {
         Event event = new Event();
         Location location = locationRepository.findByLatAndLon(
             newEventDto.getLocation().getLat(), newEventDto.getLocation().getLon());
-        if (location == null) locationRepository.save(newEventDto.getLocation());
+        if (location == null) location = locationRepository.save(newEventDto.getLocation());
         User initiator = userRepository.getReferenceById(userId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime date = LocalDateTime.parse(newEventDto.getEventDate(), formatter);

@@ -1,5 +1,6 @@
 package ru.practicum.ewmmain.events.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.events.EventService;
 import ru.practicum.ewmmain.events.model.EventDto;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users/{userId}/events")
+@Slf4j
 public class EventControllerUser {
 
     private final EventService eventService;
@@ -37,6 +39,7 @@ public class EventControllerUser {
     @PostMapping
     public EventDto createEventFromUser(@PathVariable Long userId, @RequestBody NewEventDto newEventDto)
         throws WrongTimeException {
+        log.info("neweventDto {}", newEventDto);
         return eventService.createEventFromUser(userId, newEventDto);
     }
 
