@@ -18,37 +18,37 @@ public class EventMapper {
 
     public static EventShortDto toShort(Event event) {
         return new EventShortDto(
-                event.getId(),
-                event.getTitle(),
-                event.getAnnotation(),
-                CategoryMapper.toDto(event.getCategory()),
-                event.getDescription(),
-                event.getEventDate(),
-                event.getPaid(),
-                event.getConfirmedRequests(),
-                UserMapper.toUserShortDto(event.getInitiator()),
-                event.getViews()
+            event.getId(),
+            event.getTitle(),
+            event.getAnnotation(),
+            CategoryMapper.toDto(event.getCategory()),
+            event.getDescription(),
+            event.getEventDate(),
+            event.getPaid(),
+            event.getConfirmedRequests(),
+            UserMapper.toUserShortDto(event.getInitiator()),
+            event.getViews()
         );
     }
 
     public static EventDto toDto(Event event) {
         return new EventDto(
-                event.getId(),
-                event.getTitle(),
-                event.getAnnotation(),
-                CategoryMapper.toDto(event.getCategory()),
-                event.getDescription(),
-                event.getCreatedOn(),
-                event.getEventDate(),
-                event.getPublishedOn(),
-                event.getLocation(),
-                event.getPaid(),
-                event.getParticipantLimit(),
-                event.getRequestModeration(),
-                event.getConfirmedRequests(),
-                UserMapper.toUserShortDto(event.getInitiator()),
-                event.getState(),
-                event.getViews()
+            event.getId(),
+            event.getTitle(),
+            event.getAnnotation(),
+            CategoryMapper.toDto(event.getCategory()),
+            event.getDescription(),
+            event.getCreatedOn(),
+            event.getEventDate(),
+            event.getPublishedOn(),
+            event.getLocation(),
+            event.getPaid(),
+            event.getParticipantLimit(),
+            event.getRequestModeration(),
+            event.getConfirmedRequests(),
+            UserMapper.toUserShortDto(event.getInitiator()),
+            event.getState(),
+            event.getViews()
         );
     }
 

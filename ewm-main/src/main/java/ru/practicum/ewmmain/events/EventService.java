@@ -1,6 +1,5 @@
 package ru.practicum.ewmmain.events;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -73,7 +72,7 @@ public class EventService {
         }
         if (paid != null) {
             if (paid) {
-                list = list.stream().filter(event -> event.getPaid()).collect(Collectors.toList());
+                list = list.stream().filter(Event::getPaid).collect(Collectors.toList());
             } else list = list.stream().filter(event -> !event.getPaid()).collect(Collectors.toList());
         }
         if (onlyAvailable) {
@@ -83,7 +82,7 @@ public class EventService {
         eventClient.sendToStatistics(new EndpointHitDto(
             "EWM", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now().format(
             formatter)));
-        return list.stream().map(event -> EventMapper.toShort(event)).collect(Collectors.toList());
+        return list.stream().map(EventMapper::toShort).collect(Collectors.toList());
     }
 
     public EventDto getFromIdPublic(Long id, HttpServletRequest request) throws NotFoundException, StateException {
@@ -114,7 +113,8 @@ public class EventService {
         return EventMapper.toDto(eventRepository.save(event));
     }
 
-    public EventDto editEventAdmin(Long eventId, AdminUpdateEventRequest updateEventRequest) throws NotFoundException {
+    public EventDto editEventAdmin(Long eventId, AdminUpdateEventRequest updateEventRequest)
+        throws NotFoundException {
         if (!eventRepository.existsById(eventId)) throw new NotFoundException("Мероприятия не существует");
         Event event = eventRepository.getReferenceById(eventId);
         if (updateEventRequest.getAnnotation() != null)

@@ -34,9 +34,7 @@ public class StatsService {
             List<String> uriList = List.of(uris);
             list = list.stream().filter(viewStats -> uriList.contains(viewStats.getUri()))
                 .collect(Collectors.toList());
-            }
+        }
         return list;
     }
-
-
 }

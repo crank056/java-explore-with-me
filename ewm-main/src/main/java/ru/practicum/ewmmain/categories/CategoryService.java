@@ -10,7 +10,6 @@ import ru.practicum.ewmmain.categories.model.CategoryMapper;
 import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,7 @@ public class CategoryService {
     }
 
     public CategoryDto getFromId(Long catId) throws NotFoundException {
-        if(!categoryRepository.existsById(catId)) throw new NotFoundException("Категория не существует");
+        if (!categoryRepository.existsById(catId)) throw new NotFoundException("Категория не существует");
         return CategoryMapper.toDto(categoryRepository.getReferenceById(catId));
     }
 

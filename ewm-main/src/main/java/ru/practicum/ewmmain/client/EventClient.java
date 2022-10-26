@@ -16,10 +16,10 @@ public class EventClient extends BaseClient {
     @Autowired
     public EventClient(@Value("${stat.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
+            builder
+                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
+                .requestFactory(HttpComponentsClientHttpRequestFactory::new)
+                .build()
         );
     }
 

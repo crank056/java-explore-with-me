@@ -111,12 +111,10 @@ public class RequestService {
         if (!requestRepository.existsById(requestId)) throw new NotFoundException("Запроса не существует");
         Request request = requestRepository.getReferenceById(requestId);
         Event event = eventRepository.getReferenceById(request.getEvent().getId());
-        if(request.getRequester().getId() != userId) throw new AccessException("Запрос не принадлежит пользователю");
+        if (request.getRequester().getId() != userId) throw new AccessException("Запрос не принадлежит пользователю");
         request.setStatus(Status.CANCELED);
         event.setConfirmedRequests(event.getConfirmedRequests() - 1);
         eventRepository.save(event);
         return RequestMapper.toPRDto(requestRepository.save(request));
     }
-
-
 }

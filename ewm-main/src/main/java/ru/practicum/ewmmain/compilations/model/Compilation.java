@@ -23,8 +23,8 @@ public class Compilation {
     private String title;
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "EVENTS_COMPILATIONS",
-            joinColumns = {@JoinColumn(name = "compilation_id")},
-            inverseJoinColumns = {@JoinColumn(name = "event_id")})
+        joinColumns = {@JoinColumn(name = "compilation_id")},
+        inverseJoinColumns = {@JoinColumn(name = "event_id")})
     private List<Event> eventList;
 }
 

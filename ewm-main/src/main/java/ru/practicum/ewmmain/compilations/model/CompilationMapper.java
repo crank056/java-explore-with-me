@@ -12,14 +12,14 @@ public class CompilationMapper {
     public static CompilationDto toDto(Compilation compilation) {
         List<Event> list = compilation.getEventList();
         List<EventShortDto> eventShortDtoList = new ArrayList<>();
-        for(Event event: list) {
+        for (Event event : list) {
             eventShortDtoList.add(EventMapper.toShort(event));
         }
         return new CompilationDto(
             eventShortDtoList,
-                compilation.getId(),
-                compilation.getPinned(),
-                compilation.getTitle()
+            compilation.getId(),
+            compilation.getPinned(),
+            compilation.getTitle()
         );
     }
 }

@@ -34,7 +34,8 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public List<CategoryDto> getAllFromPage(@RequestParam(required = false, defaultValue = "0") int from,
-                                    @RequestParam(required = false, defaultValue = "10") int size) throws ValidationException {
+                                            @RequestParam(required = false, defaultValue = "10") int size)
+        throws ValidationException {
         return categoryService.getAllFromPage(from, size);
     }
 

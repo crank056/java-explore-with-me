@@ -21,6 +21,4 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         LocalDateTime start, LocalDateTime end, State state, Pageable page);
 
     Page<Event> findAllByEventDateIsAfterAndState(LocalDateTime start, State state, Pageable page);
-
-
 }
