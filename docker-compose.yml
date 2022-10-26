@@ -2,31 +2,29 @@ version: '3.1'
 services:
   stat:
     build: ./ewm-stat
-    container_name: stat
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stat-db:7432/stat-db
-      - POSTGRES_USER=postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stat-db:5432/ExploreWithMeStat
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
     depends_on:
       - stat-db
   stat-db:
     image: postgres:14-alpine
-    container_name: stat-db
     ports:
-      - "7432:5432"
+      - "6541:5432"
     environment:
-      - POSTGRES_DB=stat-db
-      - POSTGRES_USER=postgres
+      - POSTGRES_DB=ExploreWithMeStat
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-  ewm-service:
+  ewm:
     build: ./ewm-main
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:6432/ewm-db
-      - POSTGRES_USER=postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ExploreWithMe
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - stat.url=http://stat:9090
     depends_on:
@@ -34,8 +32,8 @@ services:
   ewm-db:
     image: postgres:14-alpine
     ports:
-      - "6432:5432"
+      - "6542:5432"
     environment:
-      - POSTGRES_DB=ewm-db
-      - POSTGRES_USER=postgres
+      - POSTGRES_DB=ExploreWithMe
+      - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root

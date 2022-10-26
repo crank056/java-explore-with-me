@@ -125,7 +125,7 @@ public class EventService {
             event.setDescription(updateEventRequest.getDescription());
         if (updateEventRequest.getEventDate() != null)
             event.setEventDate(LocalDateTime.parse(updateEventRequest.getEventDate(), formatter));
-        Location location = new Location();
+        Location location;
         if (updateEventRequest.getLocation() != null) {
             location = locationRepository.save(updateEventRequest.getLocation());
             event.setLocation(location);
