@@ -29,13 +29,19 @@ public class AdminController {
     }
 
     @GetMapping("/{eventId}")
-    public CommentDto getAllEventComments(@PathVariable Long eventId) {
-        return commentService.getAllEventCommentsAdmin(eventId);
+    public List<CommentDto> getAllEventComments(@PathVariable Long eventId, @RequestParam int from,
+                                                @RequestParam int size) {
+        return commentService.getAllEventComments(eventId, from, size);
+    }
+
+    @GetMapping("/{commentId}")
+    public CommentDto getFromId(@PathVariable Long commentId) {
+        return commentService.getCommentFromId(commentId);
     }
 
     @PatchMapping("/{commentId}")
     public CommentDto editCommentAdmin(@PathVariable Long commentId, @RequestBody NewCommentDto newCommentDto) {
-        return commentService.editCommentAdmin(eventId, newCommentDto);
+        return commentService.editCommentAdmin(commentId, newCommentDto);
     }
 
     @DeleteMapping("/{commentId}")
