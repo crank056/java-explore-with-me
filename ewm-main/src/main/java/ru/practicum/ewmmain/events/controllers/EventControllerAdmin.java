@@ -38,13 +38,13 @@ public class EventControllerAdmin {
     }
 
     @GetMapping
-    public List<EventDto> getAllAdmin(@RequestParam(required = false) Long[] users,
+    public List<EventDto> getAllByAdmin(@RequestParam(required = false) Long[] users,
                                       @RequestParam(required = false) String[] states,
                                       @RequestParam(required = false) Long[] categories,
                                       @RequestParam(required = false) String rangeStart,
                                       @RequestParam(required = false) String rangeEnd,
                                       @RequestParam(defaultValue = "0") int from,
                                       @RequestParam(defaultValue = "10") int size) {
-        return eventService.getAllAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
+        return eventService.getAllByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 }

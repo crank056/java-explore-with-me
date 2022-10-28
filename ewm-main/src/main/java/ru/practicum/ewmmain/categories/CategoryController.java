@@ -33,14 +33,14 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    public List<CategoryDto> getAllFromPage(@RequestParam(required = false, defaultValue = "0") int from,
+    public List<CategoryDto> getAllCategoryFromPage(@RequestParam(required = false, defaultValue = "0") int from,
                                             @RequestParam(required = false, defaultValue = "10") int size)
         throws ValidationException {
-        return categoryService.getAllFromPage(from, size);
+        return categoryService.getAllCategoryFromPage(from, size);
     }
 
     @GetMapping("/categories/{catId}")
-    public CategoryDto getFromId(@PathVariable Long catId) throws NotFoundException {
-        return categoryService.getFromId(catId);
+    public CategoryDto getCategoryFromId(@PathVariable Long catId) throws NotFoundException {
+        return categoryService.getCategoryFromId(catId);
     }
 }

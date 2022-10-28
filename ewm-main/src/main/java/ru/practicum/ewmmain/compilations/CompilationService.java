@@ -25,69 +25,85 @@ public class CompilationService {
         this.eventRepository = eventRepository;
     }
 
-    public List<CompilationDto> getAllPublic(Boolean pinned, int from, int size) {
-        List<Compilation> list;
+    public List<CompilationDto> getAllCompilationsPublic(Boolean pinned, int from, int size) {
+        List<Compilation> compilationlist;
         Pageable page = PageRequest.of(from / size, size);
         if (pinned != null) {
-            list = compilationRepository.findAllByPinned(pinned, page).getContent();
+            compilationlist = compilationRepository.findAllByPinned(pinned, page).getContent();
         } else {
-            list = compilationRepository.findAll(page).getContent();
+            compilationlist = compilationRepository.findAll(page).getContent();
         }
-        return list.stream()
-            .map(compilation -> CompilationMapper.toDto(compilation)).collect(Collectors.toList());
+        return compilationlist.stream()
+                .map(CompilationMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public CompilationDto getByIdPublic(Long id) throws NotFoundException {
-        if (!compilationRepository.existsById(id)) throw new NotFoundException("Компиляции не существует");
+    public CompilationDto getCompilationByIdPublic(Long id) throws NotFoundException {
+        if (!compilationRepository.existsById(id)) {
+            throw new NotFoundException("Компиляции не существует");
+        }
         return CompilationMapper.toDto(compilationRepository.getReferenceById(id));
     }
 
-    public CompilationDto createByAdmin(NewCompilationDto newCompilationDto) {
+    public CompilationDto createCompilationByAdmin(NewCompilationDto newCompilationDto) {
         Compilation compilation = new Compilation();
-        List<Event> list = new ArrayList<>();
-        for (Long eventId : newCompilationDto.getEvents()) {
-            list.add(eventRepository.getReferenceById(eventId));
-        }
-        compilation.setEventList(list);
+        List<Event> compilationList = new ArrayList<>();
+        newCompilationDto.getEvents()
+                .forEach(eventId -> compilationList.add(eventRepository.getReferenceById(eventId)));
+        compilation.setEventList(compilationList);
         compilation.setPinned(newCompilationDto.isPinned());
         compilation.setTitle(newCompilationDto.getTitle());
         return CompilationMapper.toDto(compilationRepository.save(compilation));
     }
 
     public Boolean deleteCompilation(Long id) throws NotFoundException {
-        if (!compilationRepository.existsById(id)) throw new NotFoundException("Компиляции не существует");
+        if (!compilationRepository.existsById(id)) {
+            throw new NotFoundException("Компиляции не существует");
+        }
         compilationRepository.deleteById(id);
         return !compilationRepository.existsById(id);
     }
 
     public void deleteEventFromCompilation(Long compId, Long eventId) throws NotFoundException {
-        if (!compilationRepository.existsById(compId)) throw new NotFoundException("Компиляции не существует");
+        if (!compilationRepository.existsById(compId)) {
+            throw new NotFoundException("Компиляции не существует");
+        }
         Compilation compilation = compilationRepository.getReferenceById(compId);
-        List<Event> list = compilation.getEventList();
-        list = list.stream().filter(event -> !event.getId().equals(eventId)).collect(Collectors.toList());
-        compilation.setEventList(list);
+        List<Event> eventList = compilation.getEventList();
+        eventList = eventList.stream()
+                .filter(event -> !event.getId().equals(eventId))
+                .collect(Collectors.toList());
+        compilation.setEventList(eventList);
         compilationRepository.save(compilation);
     }
 
     public void addEventToCompilation(Long compId, Long eventId) throws NotFoundException {
-        if (!compilationRepository.existsById(compId)) throw new NotFoundException("Компиляции не существует");
-        if (!eventRepository.existsById(eventId)) throw new NotFoundException("Мероприятия не существует");
+        if (!compilationRepository.existsById(compId)) {
+            throw new NotFoundException("Компиляции не существует");
+        }
+        if (!eventRepository.existsById(eventId)) {
+            throw new NotFoundException("Мероприятия не существует");
+        }
         Compilation compilation = compilationRepository.getReferenceById(compId);
-        List<Event> list = compilation.getEventList();
-        list.add(eventRepository.getReferenceById(eventId));
-        compilation.setEventList(list);
+        List<Event> compilationList = compilation.getEventList();
+        compilationList.add(eventRepository.getReferenceById(eventId));
+        compilation.setEventList(compilationList);
         compilationRepository.save(compilation);
     }
 
-    public void pin(Long id) throws NotFoundException {
-        if (!compilationRepository.existsById(id)) throw new NotFoundException("Компиляции не существует");
+    public void pinCompilation(Long id) throws NotFoundException {
+        if (!compilationRepository.existsById(id)) {
+            throw new NotFoundException("Компиляции не существует");
+        }
         Compilation compilation = compilationRepository.getReferenceById(id);
         compilation.setPinned(true);
         compilationRepository.save(compilation);
     }
 
-    public void unPin(Long id) throws NotFoundException {
-        if (!compilationRepository.existsById(id)) throw new NotFoundException("Компиляции не существует");
+    public void unPinCompilation(Long id) throws NotFoundException {
+        if (!compilationRepository.existsById(id)) {
+            throw new NotFoundException("Компиляции не существует");
+        }
         Compilation compilation = compilationRepository.getReferenceById(id);
         compilation.setPinned(false);
         compilationRepository.save(compilation);

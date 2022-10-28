@@ -33,8 +33,12 @@ public class UserService {
         List<User> users;
         if (ids.size() > 0) {
             users = userRepository.findAllById(ids);
-        } else users = userRepository.findAll(page).getContent();
-        return users.stream().map(user -> UserMapper.toUserDto(user)).collect(Collectors.toList());
+        } else {
+            users = userRepository.findAll(page).getContent();
+        }
+        return users.stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     public boolean deleteUser(Long userId) {
@@ -43,6 +47,8 @@ public class UserService {
     }
 
     private void validatePageSize(int from, int size) throws ValidationException {
-        if (from < 0 || size < 1) throw new ValidationException("Неверные значения формата");
+        if (from < 0 || size < 1) {
+            throw new ValidationException("Неверные значения формата");
+        }
     }
 }

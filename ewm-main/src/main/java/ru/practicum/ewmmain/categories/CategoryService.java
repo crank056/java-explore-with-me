@@ -35,19 +35,25 @@ public class CategoryService {
         return !categoryRepository.existsById(catId);
     }
 
-    public List<CategoryDto> getAllFromPage(int from, int size) throws ValidationException {
+    public List<CategoryDto> getAllCategoryFromPage(int from, int size) throws ValidationException {
         validatePageSize(from, size);
         Pageable page = PageRequest.of(from / size, size, Sort.by("id").descending());
         List<Category> categories = categoryRepository.findAll(page).getContent();
-        return categories.stream().map(category -> CategoryMapper.toDto(category)).collect(Collectors.toList());
+        return categories.stream()
+                .map(CategoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public CategoryDto getFromId(Long catId) throws NotFoundException {
-        if (!categoryRepository.existsById(catId)) throw new NotFoundException("Категория не существует");
+    public CategoryDto getCategoryFromId(Long catId) throws NotFoundException {
+        if (!categoryRepository.existsById(catId)) {
+            throw new NotFoundException("Категория не существует");
+        }
         return CategoryMapper.toDto(categoryRepository.getReferenceById(catId));
     }
 
     private void validatePageSize(int from, int size) throws ValidationException {
-        if (from < 0 || size < 1) throw new ValidationException("Неверные значения формата");
+        if (from < 0 || size < 1) {
+            throw new ValidationException("Неверные значения формата");
+        }
     }
 }

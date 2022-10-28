@@ -18,20 +18,20 @@ public class CompilationController {
     }
 
     @GetMapping("/compilations")
-    public List<CompilationDto> getAllPublic(@RequestParam(required = false) Boolean pinned,
+    public List<CompilationDto> getAllCompilationsPublic(@RequestParam(required = false) Boolean pinned,
                                              @RequestParam(defaultValue = "0") int from,
                                              @RequestParam(defaultValue = "10") int size) {
-        return compilationService.getAllPublic(pinned, from, size);
+        return compilationService.getAllCompilationsPublic(pinned, from, size);
     }
 
     @GetMapping("/compilations/{compId}")
-    public CompilationDto getByIdPublic(@PathVariable Long compId) throws NotFoundException {
-        return compilationService.getByIdPublic(compId);
+    public CompilationDto getCompilationByIdPublic(@PathVariable Long compId) throws NotFoundException {
+        return compilationService.getCompilationByIdPublic(compId);
     }
 
     @PostMapping("/admin/compilations")
-    public CompilationDto createByAdmin(@RequestBody NewCompilationDto compilationDto) {
-        return compilationService.createByAdmin(compilationDto);
+    public CompilationDto createCompilationByAdmin(@RequestBody NewCompilationDto compilationDto) {
+        return compilationService.createCompilationByAdmin(compilationDto);
     }
 
     @DeleteMapping("/admin/compilations/{compId}")
@@ -51,12 +51,12 @@ public class CompilationController {
     }
 
     @DeleteMapping("/admin/compilations/{compId}/pin")
-    public void unPin(@PathVariable long compId) throws NotFoundException {
-        compilationService.unPin(compId);
+    public void unPinCompilaton(@PathVariable long compId) throws NotFoundException {
+        compilationService.unPinCompilation(compId);
     }
 
     @PatchMapping("/admin/compilations/{compId}/pin")
-    public void pin(@PathVariable long compId) throws NotFoundException {
-        compilationService.pin(compId);
+    public void pinCompilation(@PathVariable long compId) throws NotFoundException {
+        compilationService.pinCompilation(compId);
     }
 }
