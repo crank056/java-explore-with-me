@@ -9,11 +9,15 @@ import java.time.LocalDateTime;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    Page<Comment> findAllByCommentatorId(Long commentatorId, Pageable page);
+    Page<Comment> findAllByCommentatorIdOrderByRate(Long commentatorId, Pageable page);
 
-    Page<Comment> findAllByCreatedIsAfterAndEventDateIsBefore(LocalDateTime start, LocalDateTime end, Pageable page);
+    Page<Comment> findAllByCreatedBetweenOrderByRate(LocalDateTime start, LocalDateTime end, Pageable page);
 
-    Page<Comment> findAllByCreatedIsAfter(LocalDateTime start, Pageable page);
+    Page<Comment> findAllByCreatedIsAfterOrderByRate(LocalDateTime start, Pageable page);
 
-    Page<Comment> findAllByEventId(Long eventId, Pageable page);
+    Page<Comment> findAllByEventIdOrderByRate(Long eventId, Pageable page);
+
+    Page<Comment> findAllByEventIdAndCreatedBetweenOrderByRate(Long eventId, LocalDateTime start, LocalDateTime end, Pageable page);
+
+    Page<Comment> findAllByEventIdAndCreatedIsAfterOrderByRate(Long eventId, LocalDateTime start, Pageable page);
 }

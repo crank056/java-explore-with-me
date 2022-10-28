@@ -5,6 +5,7 @@ import ru.practicum.ewmmain.comments.CommentService;
 import ru.practicum.ewmmain.comments.model.CommentDto;
 import ru.practicum.ewmmain.comments.model.NewCommentDto;
 import ru.practicum.ewmmain.exceptions.AccessException;
+import ru.practicum.ewmmain.exceptions.ValidationException;
 
 import java.util.List;
 
@@ -26,7 +27,8 @@ public class UserController {
 
     @PatchMapping("/{commentId}")
     public CommentDto editComment(@PathVariable Long userId, @PathVariable Long commentId,
-                                  @RequestBody NewCommentDto newCommentDto) throws AccessException {
+                                  @RequestBody NewCommentDto newCommentDto)
+            throws AccessException, ValidationException {
         return commentService.editCommentByUser(userId, commentId, newCommentDto);
     }
 
@@ -35,6 +37,8 @@ public class UserController {
                                            @RequestParam int size) {
         return commentService.getAllFromUser(userId, from, size);
     }
+
+    //добавить методы plus minus
 
     @GetMapping("/{eventId}")
     public List<CommentDto> getAllEventComments(@PathVariable Long eventId, @RequestParam int from,

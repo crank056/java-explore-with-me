@@ -12,7 +12,8 @@ public class CommentMapper {
                 comment.getCreated().format(formatter),
                 comment.getDescription(),
                 comment.getCommentator().getId(),
-                comment.getEvent().getId());
+                comment.getEvent().getId(),
+                comment.getRate());
     }
 
     public static Comment toEntity(NewCommentDto newCommentDto) {

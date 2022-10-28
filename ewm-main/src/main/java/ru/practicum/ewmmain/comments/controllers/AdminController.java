@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmmain.comments.CommentService;
 import ru.practicum.ewmmain.comments.model.CommentDto;
 import ru.practicum.ewmmain.comments.model.NewCommentDto;
+import ru.practicum.ewmmain.exceptions.ValidationException;
 
 import java.util.List;
 
@@ -40,7 +41,8 @@ public class AdminController {
     }
 
     @PatchMapping("/{commentId}")
-    public CommentDto editCommentAdmin(@PathVariable Long commentId, @RequestBody NewCommentDto newCommentDto) {
+    public CommentDto editCommentAdmin(@PathVariable Long commentId, @RequestBody NewCommentDto newCommentDto)
+            throws ValidationException {
         return commentService.editCommentAdmin(commentId, newCommentDto);
     }
 

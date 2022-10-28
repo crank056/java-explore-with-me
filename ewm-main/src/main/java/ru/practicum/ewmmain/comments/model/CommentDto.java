@@ -13,4 +13,5 @@ public class CommentDto {
     private String description;
     private long commentatorId;
     private long eventId;
+    private long rate;
 }
