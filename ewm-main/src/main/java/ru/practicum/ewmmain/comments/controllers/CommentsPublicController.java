@@ -8,11 +8,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/comments")
-public class PublicController {
+public class CommentsPublicController {
 
     private final CommentService commentService;
 
-    public PublicController(CommentService commentService) {
+    public CommentsPublicController(CommentService commentService) {
         this.commentService = commentService;
     }
 

@@ -13,6 +13,7 @@ import ru.practicum.ewmmain.exceptions.AccessException;
 import ru.practicum.ewmmain.exceptions.NotFoundException;
 import ru.practicum.ewmmain.exceptions.ValidationException;
 import ru.practicum.ewmmain.users.UserRepository;
+import ru.practicum.ewmmain.users.model.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,8 +36,6 @@ public class CommentService {
         this.eventRepository = eventRepository;
     }
 
-    //добавить в get методы обработку ignore листа
-
     public CommentDto createComment(Long userId, Long eventId, NewCommentDto newCommentDto) {
         validateUser(userId);
         validateEvent(eventId);
@@ -49,11 +48,11 @@ public class CommentService {
     }
 
     public CommentDto editCommentByUser(Long userId, Long commentId, NewCommentDto newCommentDto)
-            throws AccessException, ValidationException {
+        throws AccessException, ValidationException {
         validateUser(userId);
         validateComment(commentId);
         Comment comment = commentRepository.getReferenceById(commentId);
-        if (comment.getCommentator().getId() != userId) {
+        if (!comment.getCommentator().getId().equals(userId)) {
             throw new AccessException("Вы не можете редактировать чужой комментарий");
         }
         if (comment.getRate() != 0) {
@@ -68,21 +67,43 @@ public class CommentService {
         Pageable page = PageRequest.of(from / size, size);
         List<Comment> list = commentRepository.findAllByCommentatorIdOrderByRate(userId, page).getContent();
         return list.stream()
-                .map(CommentMapper::toDto)
-                .collect(Collectors.toList());
+            .map(CommentMapper::toDto)
+            .collect(Collectors.toList());
     }
 
-    public CommentDto getCommentFromId(Long commentId) {
+    public CommentDto getCommentFromIdUser(Long userId, Long commentId) throws AccessException {
+        validateComment(commentId);
+        validateUser(userId);
+        Comment comment = commentRepository.getReferenceById(commentId);
+        if (userRepository.getReferenceById(userId).getIgnoreList().contains(comment.getCommentator())) {
+            throw new AccessException("Пользователь в игнорм листе");
+        }
+        return CommentMapper.toDto(commentRepository.getReferenceById(commentId));
+    }
+
+    public CommentDto getCommentFromIdAdmin(Long commentId) {
         validateComment(commentId);
         return CommentMapper.toDto(commentRepository.getReferenceById(commentId));
     }
 
-    public List<CommentDto> getAllEventComments(Long eventId, int from, int size) {
+    public List<CommentDto> getAllEventCommentsUser(Long userId, Long eventId, int from, int size) {
+        validateUser(userId);
+        validateEvent(eventId);
+        List<User> ignoreList = userRepository.getReferenceById(userId).getIgnoreList();
         Pageable page = PageRequest.of(from / size, size);
         List<Comment> list = commentRepository.findAllByEventIdOrderByRate(eventId, page).getContent();
         return list.stream()
-                .map(CommentMapper::toDto)
-                .collect(Collectors.toList());
+            .filter(comment -> !ignoreList.contains(comment.getCommentator()))
+            .map(CommentMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
+    public List<CommentDto> getAllEventCommentsAdmin(Long eventId, int from, int size) {
+        Pageable page = PageRequest.of(from / size, size);
+        List<Comment> list = commentRepository.findAllByEventIdOrderByRate(eventId, page).getContent();
+        return list.stream()
+            .map(CommentMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     public boolean deleteByUser(Long userId, Long commentId) throws AccessException {
@@ -96,7 +117,7 @@ public class CommentService {
     }
 
     public List<CommentDto> getAllCommentsAdmin(
-            String text, Long[] users, Long[] events, String startDate, String endDate, int from, int size) {
+        String text, Long[] users, Long[] events, String startDate, String endDate, int from, int size) {
         List<Comment> list;
         LocalDateTime start;
         LocalDateTime end;
@@ -115,23 +136,23 @@ public class CommentService {
         if (users != null) {
             List<Long> usersList = Arrays.asList(users);
             list = list.stream()
-                    .filter(comment -> usersList.contains(comment.getCommentator().getId()))
-                    .collect(Collectors.toList());
+                .filter(comment -> usersList.contains(comment.getCommentator().getId()))
+                .collect(Collectors.toList());
         }
         if (events != null) {
             List<Long> eventList = Arrays.asList(events);
             list = list.stream()
-                    .filter(comment -> eventList.contains(comment.getEvent().getId()))
-                    .collect(Collectors.toList());
+                .filter(comment -> eventList.contains(comment.getEvent().getId()))
+                .collect(Collectors.toList());
         }
         if (text != null) {
             list = list.stream()
-                    .filter(comment -> comment.getDescription().toLowerCase().contains(text.toLowerCase()))
-                    .collect(Collectors.toList());
+                .filter(comment -> comment.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .collect(Collectors.toList());
         }
         return list.stream()
-                .map(CommentMapper::toDto)
-                .collect(Collectors.toList());
+            .map(CommentMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     public List<CommentDto> getAllEventCommentsPublic(Long eventId, String text,
@@ -148,26 +169,26 @@ public class CommentService {
             if (endDate != null) {
                 end = LocalDateTime.parse(endDate, formatter);
                 commentList = commentRepository.findAllByEventIdAndCreatedBetweenOrderByRate(
-                        eventId, start, end, page).getContent();
+                    eventId, start, end, page).getContent();
             } else {
                 commentList = commentRepository.findAllByEventIdAndCreatedIsAfterOrderByRate(
-                        eventId, start, page).getContent();
+                    eventId, start, page).getContent();
             }
         }
         if (users != null) {
             List<Long> usersList = Arrays.asList(users);
             commentList = commentList.stream()
-                    .filter(comment -> usersList.contains(comment.getCommentator().getId()))
-                    .collect(Collectors.toList());
+                .filter(comment -> usersList.contains(comment.getCommentator().getId()))
+                .collect(Collectors.toList());
         }
         if (text != null) {
             commentList = commentList.stream()
-                    .filter(comment -> comment.getDescription().toLowerCase().contains(text.toLowerCase()))
-                    .collect(Collectors.toList());
+                .filter(comment -> comment.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .collect(Collectors.toList());
         }
         return commentList.stream()
-                .map(CommentMapper::toDto)
-                .collect(Collectors.toList());
+            .map(CommentMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     public CommentDto editCommentAdmin(Long commentId, NewCommentDto newCommentDto) throws ValidationException {
@@ -184,6 +205,60 @@ public class CommentService {
         validateComment(commentId);
         commentRepository.deleteById(commentId);
         return !commentRepository.existsById(commentId);
+    }
+
+    public void addPlusToComment(Long userId, Long commentId) throws ValidationException {
+        validateUser(userId);
+        validateComment(commentId);
+        Comment comment = commentRepository.getReferenceById(commentId);
+        User user = userRepository.getReferenceById(userId);
+        if (comment.getCommentator().getId().equals(userId)) {
+            throw new ValidationException("Чувак, нельзя ставить себе плюсы, ну ты чего?!");
+        }
+        if (user.getRatingList().contains(comment)) {
+            throw new ValidationException("Нельзя поставить больше одной оценки");
+        }
+        comment.setRate(comment.getRate() + 1);
+        commentRepository.save(comment);
+        user.getRatingList().add(comment);
+        userRepository.save(user);
+    }
+
+    public void addMinusToComment(Long userId, Long commentId) throws ValidationException {
+        validateUser(userId);
+        validateComment(commentId);
+        Comment comment = commentRepository.getReferenceById(commentId);
+        User user = userRepository.getReferenceById(userId);
+        if (comment.getCommentator().getId().equals(userId)) {
+            throw new ValidationException("Нельзя поставить минус на свой комментарий");
+        }
+        if (user.getRatingList().contains(comment)) {
+            throw new ValidationException("Нельзя поставить больше одной оценки");
+        }
+        comment.setRate(comment.getRate() - 1);
+        commentRepository.save(comment);
+        user.getRatingList().add(comment);
+        userRepository.save(user);
+    }
+
+    public void addToIgnoreList(Long userId, Long ignoredId) {
+        validateUser(userId);
+        validateUser(ignoredId);
+        User user = userRepository.getReferenceById(userId);
+        List<User> ignoredList = user.getIgnoreList();
+        ignoredList.add(userRepository.getReferenceById(ignoredId));
+        user.setIgnoreList(ignoredList);
+        userRepository.save(user);
+    }
+
+    public void deleteFromIgnoreList(Long userId, Long ignoredId) {
+        validateUser(userId);
+        validateUser(ignoredId);
+        User user = userRepository.getReferenceById(userId);
+        List<User> ignoredList = user.getIgnoreList();
+        ignoredList.remove(userRepository.getReferenceById(ignoredId));
+        user.setIgnoreList(ignoredList);
+        userRepository.save(user);
     }
 
     @SneakyThrows

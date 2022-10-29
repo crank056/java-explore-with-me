@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users/{userId}/comments")
-public class UserController {
+public class CommentsUserController {
 
     private final CommentService commentService;
 
-    public UserController(CommentService commentService) {
+    public CommentsUserController(CommentService commentService) {
         this.commentService = commentService;
     }
 
@@ -28,7 +28,7 @@ public class UserController {
     @PatchMapping("/{commentId}")
     public CommentDto editComment(@PathVariable Long userId, @PathVariable Long commentId,
                                   @RequestBody NewCommentDto newCommentDto)
-            throws AccessException, ValidationException {
+        throws AccessException, ValidationException {
         return commentService.editCommentByUser(userId, commentId, newCommentDto);
     }
 
@@ -38,21 +38,41 @@ public class UserController {
         return commentService.getAllFromUser(userId, from, size);
     }
 
-    //добавить методы plus minus
-
-    @GetMapping("/{eventId}")
-    public List<CommentDto> getAllEventComments(@PathVariable Long eventId, @RequestParam int from,
-                                                @RequestParam int size) {
-        return commentService.getAllEventComments(eventId, from, size);
+    @GetMapping("/event/{eventId}")
+    public List<CommentDto> getAllEventComments(@PathVariable Long userId, @PathVariable Long eventId,
+                                                @RequestParam int from, @RequestParam int size) {
+        return commentService.getAllEventCommentsUser(userId, eventId, from, size);
     }
 
     @GetMapping("/{commentId}")
-    public CommentDto getFromId(@PathVariable Long commentId) {
-        return commentService.getCommentFromId(commentId);
+    public CommentDto getFromId(@PathVariable Long userId, @PathVariable Long commentId) throws AccessException {
+        return commentService.getCommentFromIdUser(userId, commentId);
     }
 
     @DeleteMapping("/{commentId}")
     public boolean deleteFromId(@PathVariable Long userId, @PathVariable Long commentId) throws AccessException {
         return commentService.deleteByUser(userId, commentId);
+    }
+
+    @PatchMapping("/{commentId}/plus")
+    public void addPlusToComment(@PathVariable Long userId, @PathVariable Long commentId)
+        throws ValidationException {
+        commentService.addPlusToComment(userId, commentId);
+    }
+
+    @PatchMapping("/{commentId}/minus")
+    public void addMinusToComment(@PathVariable Long userId, @PathVariable Long commentId)
+        throws ValidationException {
+        commentService.addMinusToComment(userId, commentId);
+    }
+
+    @PatchMapping("/ignore/{ignoredId}")
+    public void addToIgnoreList(@PathVariable Long userId, @PathVariable Long ignoredId) {
+        commentService.addToIgnoreList(userId, ignoredId);
+    }
+
+    @PatchMapping("/unIgnore/{ignoredId}")
+    public void deleteFromIgnoreList(@PathVariable Long userId, @PathVariable Long ignoredId) {
+        commentService.deleteFromIgnoreList(userId, ignoredId);
     }
 }

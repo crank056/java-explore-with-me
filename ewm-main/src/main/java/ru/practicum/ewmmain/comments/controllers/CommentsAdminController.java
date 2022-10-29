@@ -10,11 +10,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin/comments")
-public class AdminController {
+public class CommentsAdminController {
 
     private final CommentService commentService;
 
-    public AdminController(CommentService commentService) {
+    public CommentsAdminController(CommentService commentService) {
         this.commentService = commentService;
     }
 
@@ -29,20 +29,20 @@ public class AdminController {
         return commentService.getAllCommentsAdmin(text, users, events, start, end, from, size);
     }
 
-    @GetMapping("/{eventId}")
+    @GetMapping("/event/{eventId}")
     public List<CommentDto> getAllEventComments(@PathVariable Long eventId, @RequestParam int from,
                                                 @RequestParam int size) {
-        return commentService.getAllEventComments(eventId, from, size);
+        return commentService.getAllEventCommentsAdmin(eventId, from, size);
     }
 
     @GetMapping("/{commentId}")
     public CommentDto getFromId(@PathVariable Long commentId) {
-        return commentService.getCommentFromId(commentId);
+        return commentService.getCommentFromIdAdmin(commentId);
     }
 
     @PatchMapping("/{commentId}")
     public CommentDto editCommentAdmin(@PathVariable Long commentId, @RequestBody NewCommentDto newCommentDto)
-            throws ValidationException {
+        throws ValidationException {
         return commentService.editCommentAdmin(commentId, newCommentDto);
     }
 
