@@ -1,6 +1,6 @@
 version: '3.1'
 services:
-  stat:
+  stats-server:
     build: ./ewm-stat
     ports:
       - "9090:9090"
@@ -18,7 +18,7 @@ services:
       - POSTGRES_DB=ExploreWithMeStat
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-  ewm:
+  ewm-service:
     build: ./ewm-main
     ports:
       - "8080:8080"
