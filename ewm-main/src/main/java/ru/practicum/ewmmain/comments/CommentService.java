@@ -58,7 +58,7 @@ public class CommentService {
         if (comment.getRate() != 0) {
             throw new ValidationException("Нельзя изменить оцененный комментарий");
         }
-        comment.setDescription(newCommentDto.getDescription());
+        comment.setText(newCommentDto.getText());
         return CommentMapper.toDto(commentRepository.save(comment));
     }
 
@@ -147,7 +147,7 @@ public class CommentService {
         }
         if (text != null) {
             list = list.stream()
-                .filter(comment -> comment.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .filter(comment -> comment.getText().toLowerCase().contains(text.toLowerCase()))
                 .collect(Collectors.toList());
         }
         return list.stream()
@@ -183,7 +183,7 @@ public class CommentService {
         }
         if (text != null) {
             commentList = commentList.stream()
-                .filter(comment -> comment.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .filter(comment -> comment.getText().toLowerCase().contains(text.toLowerCase()))
                 .collect(Collectors.toList());
         }
         return commentList.stream()
@@ -197,7 +197,7 @@ public class CommentService {
             throw new ValidationException("Нельзя изменить оцененный комментарий");
         }
         Comment comment = commentRepository.getReferenceById(commentId);
-        comment.setDescription(newCommentDto.getDescription());
+        comment.setText(newCommentDto.getText());
         return CommentMapper.toDto(commentRepository.save(comment));
     }
 

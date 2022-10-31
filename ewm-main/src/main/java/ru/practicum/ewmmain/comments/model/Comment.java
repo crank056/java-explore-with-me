@@ -21,7 +21,7 @@ public class Comment {
     @Column(nullable = false)
     private LocalDateTime created;
     @Column(nullable = false)
-    private String description;
+    private String text;
     @ManyToOne
     @JoinColumn(name = "commentator_id", referencedColumnName = "id")
     private User commentator;

@@ -10,7 +10,7 @@ public class CommentMapper {
         return new CommentDto(
                 comment.getId(),
                 comment.getCreated().format(formatter),
-                comment.getDescription(),
+                comment.getText(),
                 comment.getCommentator().getId(),
                 comment.getEvent().getId(),
                 comment.getRate());
@@ -18,7 +18,7 @@ public class CommentMapper {
 
     public static Comment toEntity(NewCommentDto newCommentDto) {
         Comment comment = new Comment();
-        comment.setDescription(newCommentDto.getDescription());
+        comment.setText(newCommentDto.getText());
         return comment;
     }
 }
