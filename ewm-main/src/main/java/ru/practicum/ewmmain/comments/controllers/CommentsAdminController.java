@@ -30,8 +30,9 @@ public class CommentsAdminController {
     }
 
     @GetMapping("/event/{eventId}")
-    public List<CommentDto> getAllEventComments(@PathVariable Long eventId, @RequestParam int from,
-                                                @RequestParam int size) {
+    public List<CommentDto> getAllEventComments(@PathVariable Long eventId,
+                                                @RequestParam(defaultValue = "0") int from,
+                                                @RequestParam(defaultValue = "10") int size) {
         return commentService.getAllEventCommentsAdmin(eventId, from, size);
     }
 

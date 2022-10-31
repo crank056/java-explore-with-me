@@ -65,8 +65,8 @@ public class CommentService {
     public List<CommentDto> getAllFromUser(Long userId, int from, int size) {
         validateUser(userId);
         Pageable page = PageRequest.of(from / size, size);
-        List<Comment> list = commentRepository.findAllByCommentatorIdOrderByRate(userId, page).getContent();
-        return list.stream()
+        return commentRepository.findAllByCommentatorIdOrderByRate(userId, page).getContent()
+            .stream()
             .map(CommentMapper::toDto)
             .collect(Collectors.toList());
     }
