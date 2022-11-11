@@ -26,7 +26,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ExploreWithMe
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-      - stat.url=http://stat:9090
+      - stat.url=http://stats-server:9090
     depends_on:
       - ewm-db
   ewm-db:

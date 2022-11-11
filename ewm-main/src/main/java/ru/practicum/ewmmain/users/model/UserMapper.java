@@ -1,5 +1,7 @@
 package ru.practicum.ewmmain.users.model;
 
+import java.util.ArrayList;
+
 public class UserMapper {
 
     public static UserDto toUserDto(User user) {
@@ -14,7 +16,9 @@ public class UserMapper {
         return new User(
             userDto.getId(),
             userDto.getName(),
-            userDto.getEmail()
+            userDto.getEmail(),
+            new ArrayList<>(),
+            new ArrayList<>()
         );
     }
 
