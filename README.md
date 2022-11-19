@@ -21,6 +21,10 @@
 
 <a href="https://github.com/crank056/java-explore-with-me/blob/main/ewm-stats-service-spec.json">Specification of stats service</a>
 
+<a href="https://github.com/crank056/java-explore-with-me/blob/main/ewm-main-service.json">Postman tests of main service</a>
+<a href="https://github.com/crank056/java-explore-with-me/blob/main/ewm-stat-service.json">Postman tests of stats service</a>
+
+
 # Launch
 <br> The launch is carried out using Docker containers.
 <br> Requirements:
